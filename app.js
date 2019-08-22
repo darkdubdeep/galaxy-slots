@@ -1,5 +1,5 @@
 const app = new PIXI.Application({
-    backgroundColor: 0x4f4f4f,
+    backgroundColor: 0x2a2f36,
     width: window.screen.width,
     height: window.screen.height
 });
@@ -11,7 +11,8 @@ app.loader
         'img/sym2.png',
         'img/sym3.png',
         'img/sym4.png',
-        'img/sym5.png'
+        'img/sym5.png',
+        'img/asteroid-transparent.png'
     ])
     .load(onAssetsLoaded);
 
@@ -31,11 +32,31 @@ function onAssetsLoaded() {
         PIXI.Texture.from('img/sym5.png')
     ];
 
+    const asteroidTexture = PIXI.Texture.from('img/asteroid-transparent.png');
+    const asteroidSprite = new PIXI.Sprite(asteroidTexture);
+    asteroidSprite.width = 1100;
+    asteroidSprite.height = 850;
+    asteroidSprite.y = (window.screen.height - 2100) / 3;
+    asteroidSprite.x = (window.screen.width - asteroidSprite.width) / 2;
     // Build the reels
     let reels = [];
     const reelContainer = new PIXI.Container();
+
     const rc = new PIXI.Container();
-    rc.x = REEL_WIDTH;
+    rc.x = (app.screen.width - 150) / 2;
+    rc.y = -125;
+
+    const reelSubContainer = new PIXI.Container();
+    reelSubContainer.width = 150;
+    reelSubContainer.x = (app.screen.width - 150) / 2;
+
+    const subContainerBackground = new PIXI.Graphics();
+    subContainerBackground.beginFill(0x0c0a29);
+    subContainerBackground.drawRect(0, -140, 150, 500);
+    reelSubContainer.addChild(subContainerBackground);
+
+    reelContainer.addChild(asteroidSprite);
+    reelContainer.addChild(reelSubContainer);
     reelContainer.addChild(rc);
 
     const reel = {
@@ -70,14 +91,14 @@ function onAssetsLoaded() {
     app.stage.addChild(reelContainer);
     // Build top & bottom covers and position reelContainer
     const margin = (app.screen.height - SYMBOL_SIZE * 3) / 2;
-    reelContainer.y = margin;
-    reelContainer.x = Math.round(app.screen.width - REEL_WIDTH * 5);
+    reelContainer.y = 300;
+    // reelContainer.x = Math.round(app.screen.width / 5);
     const top = new PIXI.Graphics();
-    top.beginFill(0x4f4f4f);
-    top.drawRect(0, 0, app.screen.width, margin);
+    top.beginFill(0x2a2f36);
+    top.drawRect(0, 0, app.screen.width, 160);
     const bottom = new PIXI.Graphics();
-    bottom.beginFill(0x4f4f4f);
-    bottom.drawRect(0, SYMBOL_SIZE * 3 + margin, app.screen.width, margin);
+    bottom.beginFill(0x2a2f36);
+    bottom.drawRect(0, 640, app.screen.width, margin);
 
     // Add play text
     const style = new PIXI.TextStyle({
@@ -125,7 +146,7 @@ function onAssetsLoaded() {
     // Add header text
     const headerText = new PIXI.Text('GALAXY SLOTS', style);
     headerText.x = Math.round((top.width - headerText.width) / 2);
-    headerText.y = Math.round((margin - headerText.height) / 2);
+    headerText.y = 15;
     top.addChild(headerText);
 
     app.stage.addChild(top);
