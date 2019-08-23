@@ -1,7 +1,7 @@
 const app = new PIXI.Application({
     backgroundColor: 0x2a2f36,
-    width: window.screen.width,
-    height: window.screen.height
+    width: window.innerWidth,
+    height: window.innerHeight
 });
 document.body.appendChild(app.view);
 
@@ -12,7 +12,7 @@ app.loader
         'img/sym3.png',
         'img/sym4.png',
         'img/sym5.png',
-        'img/asteroid-transparent.png'
+        'img/planets.png'
     ])
     .load(onAssetsLoaded);
 
@@ -32,12 +32,15 @@ function onAssetsLoaded() {
         PIXI.Texture.from('img/sym5.png')
     ];
 
-    const asteroidTexture = PIXI.Texture.from('img/asteroid-transparent.png');
+    const asteroidTexture = PIXI.Texture.from('img/planets.png');
     const asteroidSprite = new PIXI.Sprite(asteroidTexture);
-    asteroidSprite.width = 1100;
-    asteroidSprite.height = 850;
-    asteroidSprite.y = (window.screen.height - 2100) / 3;
-    asteroidSprite.x = (window.screen.width - asteroidSprite.width) / 2;
+    asteroidSprite.x = 350;
+    asteroidSprite.y = 150;
+    asteroidSprite.anchor.x = 0.5;
+    asteroidSprite.anchor.y = 0.5;
+    app.ticker.add(() => {
+        asteroidSprite.rotation += 0.01;
+    });
     // Build the reels
     let reels = [];
     const reelContainer = new PIXI.Container();
@@ -46,17 +49,17 @@ function onAssetsLoaded() {
     rc.x = (app.screen.width - 150) / 2;
     rc.y = -125;
 
-    const reelSubContainer = new PIXI.Container();
-    reelSubContainer.width = 150;
-    reelSubContainer.x = (app.screen.width - 150) / 2;
+    // const reelSubContainer = new PIXI.Container();
+    // reelSubContainer.width = 150;
+    // reelSubContainer.x = (app.screen.width - 150) / 2;
 
-    const subContainerBackground = new PIXI.Graphics();
-    subContainerBackground.beginFill(0x0c0a29);
-    subContainerBackground.drawRect(0, -140, 150, 500);
-    reelSubContainer.addChild(subContainerBackground);
+    // const subContainerBackground = new PIXI.Graphics();
+    // subContainerBackground.beginFill(0x0c0a29);
+    // subContainerBackground.drawRect(0, -140, 150, 500);
+    // reelSubContainer.addChild(subContainerBackground);
 
     reelContainer.addChild(asteroidSprite);
-    reelContainer.addChild(reelSubContainer);
+    // reelContainer.addChild(reelSubContainer);
     reelContainer.addChild(rc);
 
     const reel = {
@@ -90,74 +93,149 @@ function onAssetsLoaded() {
 
     app.stage.addChild(reelContainer);
     // Build top & bottom covers and position reelContainer
-    const margin = (app.screen.height - SYMBOL_SIZE * 3) / 2;
+    const margin = (app.screen.height - SYMBOL_SIZE * 2) / 2;
+    console.log(SYMBOL_SIZE);
     reelContainer.y = 300;
     // reelContainer.x = Math.round(app.screen.width / 5);
     const top = new PIXI.Graphics();
     top.beginFill(0x2a2f36);
-    top.drawRect(0, 0, app.screen.width, 160);
+    top.drawRect(0, 0, 140, rc.height / 4.2);
+    top.x = (app.screen.width - 140) / 2;
+    top.y = -300;
     const bottom = new PIXI.Graphics();
     bottom.beginFill(0x2a2f36);
-    bottom.drawRect(0, 640, app.screen.width, margin);
+    let bottomHeight = window.innerHeight - rc.height + rc.height / 4;
+    console.log('bottomHeight');
+    console.log(rc.height);
+    console.log(rc.y);
+    bottom.drawRect(0, 0, 140, app.screen.height / 3);
+    bottom.x = (app.screen.width - 140) / 2;
+    console.log(reelContainer.height);
+
+    bottom.y = 325;
 
     // Add play text
-    const style = new PIXI.TextStyle({
+    const mainTextStyle = new PIXI.TextStyle({
         fontFamily: 'Arial',
-        fontSize: 36,
         fontStyle: 'italic',
+        fontSize: 36,
         fontWeight: 'bold',
-        fill: ['#ffffff', '#00ff99'], // gradient
-        stroke: '#4a1850',
-        strokeThickness: 5,
-        dropShadow: true,
-        dropShadowColor: '#000000',
-        dropShadowBlur: 4,
-        dropShadowAngle: Math.PI / 6,
-        dropShadowDistance: 6,
-        wordWrap: true,
+        fill: ['#ffbffc', '#f5d5f3'], // gradient
         wordWrapWidth: 440
     });
 
-    const playText = new PIXI.Text('Spin the wheels!', style);
-    playText.x = Math.round((bottom.width - playText.width) / 2);
-    playText.y =
-        app.screen.height - margin + Math.round((margin - playText.height) / 2);
-    bottom.addChild(playText);
-
+    const mainTextContainer = new PIXI.Graphics();
+    mainTextContainer.beginFill(0x2a2f36);
+    mainTextContainer.drawRect(0, 0, 250, 150);
+    mainTextContainer.x = (app.screen.width + 500) / 2;
+    reelContainer.addChild(mainTextContainer);
     let balanceText;
     const balanceTextCreator = () => {
-        balanceText = new PIXI.Text(`Balance: ${money} $`, style);
-        balanceText.x = Math.round((bottom.width - balanceText.width) / 2);
-        balanceText.y =
-            app.screen.height -
-            margin +
-            Math.round(margin - balanceText.height * 2);
-        bottom.addChild(balanceText);
+        balanceText = new PIXI.Text(`BALANCE: ${money} $`, mainTextStyle);
+        mainTextContainer.addChild(balanceText);
     };
 
-    let betText = new PIXI.Text('Bet: 1 $', style);
-    betText.x = Math.round((bottom.width - betText.width) / 2);
-    betText.y =
-        app.screen.height - margin + Math.round(margin - betText.height * 3);
-    bottom.addChild(betText);
+    let betText = new PIXI.Text('BET: 1 $', mainTextStyle);
+    betText.y = 100;
+
+    mainTextContainer.addChild(betText);
 
     balanceTextCreator();
 
-    // Add header text
-    const headerText = new PIXI.Text('GALAXY SLOTS', style);
-    headerText.x = Math.round((top.width - headerText.width) / 2);
-    headerText.y = 15;
-    top.addChild(headerText);
+    reelContainer.addChild(top);
+    reelContainer.addChild(bottom);
 
-    app.stage.addChild(top);
-    app.stage.addChild(bottom);
+    const playButton = new PIXI.Graphics();
+    playButton.lineStyle(2, 0xff00ff, 1);
+    playButton.beginFill(0x650a5a, 0.25);
+    playButton.drawRoundedRect(0, 20, 100, 100, 16);
+    playButton.endFill();
+    playButton.x = (bottom.width - playButton.width) / 2;
+    playButton.interactive = true;
+    playButton.buttonMode = true;
 
-    // Set the interactivity.
-    bottom.interactive = true;
-    bottom.buttonMode = true;
-    bottom.addListener('pointerdown', () => {
-        startPlay();
+    const playButtonTextStyle = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontStyle: 'italic',
+        fontSize: 15,
+        fontWeight: 'bold',
+        fill: ['#ffbffc', '#f5d5f3'], // gradient
+        wordWrapWidth: 440
     });
+
+    let playButtonText = new PIXI.Text('PLAY', playButtonTextStyle);
+    playButtonText.x = 30;
+    playButtonText.y = 60;
+    playButton.addChild(playButtonText);
+    bottom.addChild(playButton);
+    // Set the interactivity.
+
+    playButton.addListener('pointerdown', () => {
+        startPlay();
+        playButton.scale.set(1.1, 1.1);
+        playButton.x -= 5;
+        setTimeout(() => {
+            playButton.x += 5;
+            playButton.scale.set(1.0, 1.0);
+        }, 100);
+    });
+
+    // decoration
+
+    function createGradTexture() {
+        // adjust it if somehow you need better quality for very very big images
+        const quality = 256;
+        const canvas = document.createElement('canvas');
+        canvas.width = quality;
+        canvas.height = 1;
+
+        const ctx = canvas.getContext('2d');
+
+        // use canvas2d API to create gradient
+        const grd = ctx.createLinearGradient(0, 0, quality, 0);
+        grd.addColorStop(0, '#2d3645');
+        grd.addColorStop(0.5, '#45536b');
+
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, quality, 1);
+
+        return PIXI.Texture.from(canvas);
+    }
+
+    const gradTexture = createGradTexture();
+
+    // const sprite = new PIXI.Sprite(gradTexture);
+    // sprite.position.set(380, 350);
+    // sprite.rotation = Math.PI / 8;
+    // sprite.width = 300;
+    // sprite.height = 300;
+    // app.stage.addChild(sprite);
+
+    // sprite.anchor.x = 0.5;
+    // sprite.anchor.y = 0.5;
+    // app.ticker.add(() => {
+    //     sprite.rotation += 0.01;
+    // });
+
+    // // ARC ////
+    // const arc = new PIXI.Graphics();
+
+    // arc.lineStyle(5, 0xaa00bb, 1);
+    // arc.beginFill(gradient('#9ff', '#033'), 1);
+    // arc.drawCircle(400, 250, 100);
+
+    // function gradient(from, to) {
+    //     const c = document.createElement('canvas');
+    //     const ctx = c.getContext('2d');
+    //     const grd = ctx.createLinearGradient(0, 0, 100, 100);
+    //     grd.addColorStop(0, from);
+    //     grd.addColorStop(1, to);
+    //     ctx.fillStyle = grd;
+    //     ctx.fillRect(0, 0, 100, 100);
+    //     return new PIXI.Texture.from(c);
+    // }
+
+    // app.stage.addChild(arc);
 
     let running = false;
 
@@ -173,7 +251,7 @@ function onAssetsLoaded() {
             return;
         }
         money--;
-        bottom.removeChild(balanceText);
+        mainTextContainer.removeChild(balanceText);
 
         balanceTextCreator();
         const r = reels[0];
@@ -205,12 +283,9 @@ function onAssetsLoaded() {
                 combination[3]._texture.textureCacheIds[0]
         ) {
             money += 2;
-            console.log('small nongp');
-            console.log(money);
         } else {
-            console.log('сосни хуйца');
         }
-        bottom.removeChild(balanceText);
+        mainTextContainer.removeChild(balanceText);
 
         balanceTextCreator();
     }
