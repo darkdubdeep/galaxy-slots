@@ -12,7 +12,9 @@ app.loader
         'img/sym3.png',
         'img/sym4.png',
         'img/sym5.png',
-        'img/planets.png'
+        'img/big-planet.png',
+        'img/small-planet.png',
+        'sounds/main-theme.mp3'
     ])
     .load(onAssetsLoaded);
 
@@ -32,15 +34,30 @@ function onAssetsLoaded() {
         PIXI.Texture.from('img/sym5.png')
     ];
 
-    const asteroidTexture = PIXI.Texture.from('img/planets.png');
-    const asteroidSprite = new PIXI.Sprite(asteroidTexture);
-    asteroidSprite.x = 350;
-    asteroidSprite.y = 150;
-    asteroidSprite.anchor.x = 0.5;
-    asteroidSprite.anchor.y = 0.5;
+    const bigPlanetTexture = PIXI.Texture.from('img/big-planet.png');
+    const bigPlanetSprite = new PIXI.Sprite(bigPlanetTexture);
+    bigPlanetSprite.width = 350;
+    bigPlanetSprite.height = 350;
+    bigPlanetSprite.x = app.screen.width / 4.3;
+    bigPlanetSprite.y = app.screen.height / 7;
+    bigPlanetSprite.anchor.x = 0.5;
+    bigPlanetSprite.anchor.y = 0.5;
     app.ticker.add(() => {
-        asteroidSprite.rotation += 0.01;
+        bigPlanetSprite.rotation += 0.003;
     });
+
+    const smallPlanetTexture = PIXI.Texture.from('img/small-planet.png');
+    const smallPlanetSprite = new PIXI.Sprite(smallPlanetTexture);
+    smallPlanetSprite.width = 150;
+    smallPlanetSprite.height = 150;
+    smallPlanetSprite.x = app.screen.width / 4.9;
+    smallPlanetSprite.y = app.screen.height / 7;
+    smallPlanetSprite.anchor.x = 1.9;
+    smallPlanetSprite.anchor.y = 1.9;
+    app.ticker.add(() => {
+        smallPlanetSprite.rotation += 0.003;
+    });
+
     // Build the reels
     let reels = [];
     const reelContainer = new PIXI.Container();
@@ -49,17 +66,8 @@ function onAssetsLoaded() {
     rc.x = (app.screen.width - 150) / 2;
     rc.y = -125;
 
-    // const reelSubContainer = new PIXI.Container();
-    // reelSubContainer.width = 150;
-    // reelSubContainer.x = (app.screen.width - 150) / 2;
-
-    // const subContainerBackground = new PIXI.Graphics();
-    // subContainerBackground.beginFill(0x0c0a29);
-    // subContainerBackground.drawRect(0, -140, 150, 500);
-    // reelSubContainer.addChild(subContainerBackground);
-
-    reelContainer.addChild(asteroidSprite);
-    // reelContainer.addChild(reelSubContainer);
+    reelContainer.addChild(bigPlanetSprite);
+    reelContainer.addChild(smallPlanetSprite);
     reelContainer.addChild(rc);
 
     const reel = {
@@ -389,3 +397,17 @@ function lerp(a1, a2, t) {
 function backout(amount) {
     return t => --t * t * ((amount + 1) * t + amount) + 1;
 }
+
+// const sound = PIXI.sound.Sound.from('sounds/main-theme.mp3');
+
+// // PIXI.sound.Sound.from({
+// //     url: 'sounds/main-theme.mp3',
+// //     autoPlay: true,
+// //     complete: function() {}
+// // });
+
+// var sound = new Howl({
+//     src: ['sounds/main-theme.mp3']
+// });
+
+// sound.play();
