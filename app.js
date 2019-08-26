@@ -1,3 +1,7 @@
+import { consoler } from './modules/textures.js';
+
+consoler();
+
 const app = new PIXI.Application({
     backgroundColor: 0x2a2f36,
     width: window.innerWidth,
@@ -13,8 +17,7 @@ app.loader
         'img/sym4.png',
         'img/sym5.png',
         'img/big-planet.png',
-        'img/small-planet.png',
-        'sounds/main-theme.mp3'
+        'img/small-planet.png'
     ])
     .load(onAssetsLoaded);
 
@@ -199,61 +202,6 @@ function onAssetsLoaded() {
     });
 
     // decoration
-
-    function createGradTexture() {
-        // adjust it if somehow you need better quality for very very big images
-        const quality = 256;
-        const canvas = document.createElement('canvas');
-        canvas.width = quality;
-        canvas.height = 1;
-
-        const ctx = canvas.getContext('2d');
-
-        // use canvas2d API to create gradient
-        const grd = ctx.createLinearGradient(0, 0, quality, 0);
-        grd.addColorStop(0, '#2d3645');
-        grd.addColorStop(0.5, '#45536b');
-
-        ctx.fillStyle = grd;
-        ctx.fillRect(0, 0, quality, 1);
-
-        return PIXI.Texture.from(canvas);
-    }
-
-    const gradTexture = createGradTexture();
-
-    // const sprite = new PIXI.Sprite(gradTexture);
-    // sprite.position.set(380, 350);
-    // sprite.rotation = Math.PI / 8;
-    // sprite.width = 300;
-    // sprite.height = 300;
-    // app.stage.addChild(sprite);
-
-    // sprite.anchor.x = 0.5;
-    // sprite.anchor.y = 0.5;
-    // app.ticker.add(() => {
-    //     sprite.rotation += 0.01;
-    // });
-
-    // // ARC ////
-    // const arc = new PIXI.Graphics();
-
-    // arc.lineStyle(5, 0xaa00bb, 1);
-    // arc.beginFill(gradient('#9ff', '#033'), 1);
-    // arc.drawCircle(400, 250, 100);
-
-    // function gradient(from, to) {
-    //     const c = document.createElement('canvas');
-    //     const ctx = c.getContext('2d');
-    //     const grd = ctx.createLinearGradient(0, 0, 100, 100);
-    //     grd.addColorStop(0, from);
-    //     grd.addColorStop(1, to);
-    //     ctx.fillStyle = grd;
-    //     ctx.fillRect(0, 0, 100, 100);
-    //     return new PIXI.Texture.from(c);
-    // }
-
-    // app.stage.addChild(arc);
 
     let running = false;
 
