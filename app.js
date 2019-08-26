@@ -179,6 +179,11 @@ function onAssetsLoaded() {
     // Set the interactivity.
 
     playButton.addListener('pointerdown', () => {
+        var sound = new Howl({
+            src: ['sounds/button-sound.mp3']
+        });
+        sound.play();
+
         startPlay();
         playButton.scale.set(1.1, 1.1);
         playButton.x -= 5;
@@ -400,14 +405,26 @@ function backout(amount) {
 
 // const sound = PIXI.sound.Sound.from('sounds/main-theme.mp3');
 
-// // PIXI.sound.Sound.from({
-// //     url: 'sounds/main-theme.mp3',
-// //     autoPlay: true,
-// //     complete: function() {}
-// // });
-
-// var sound = new Howl({
-//     src: ['sounds/main-theme.mp3']
+// PIXI.sound.Sound.from({
+//     url: 'sounds/main-theme.mp3',
+//     autoPlay: true,
+//     complete: function() {}
 // });
 
-// sound.play();
+var sound = new Howl({
+    src: ['sounds/main-theme.mp3']
+});
+sound.play();
+
+function simulateClick() {
+    var evt = document.createEvent('Events');
+    evt.initEvent('click', true, true);
+    window.dispatchEvent(evt);
+}
+addEventListener(
+    'click',
+    function() {
+        console.log('test');
+    },
+    false
+);
