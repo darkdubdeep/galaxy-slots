@@ -1,0 +1,23 @@
+{
+    "name": "galay-slots",
+    "version": "1.0.0",
+    "description": "",
+    "main": "app.js",
+    "scripts": {
+        "start": "browser-sync start --server",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/darkdubdeep/galaxy-slots.git"
+    },
+    "author": "Ilnur Ibeagimov",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/darkdubdeep/galaxy-slots/issues"
+    },
+    "homepage": "https://github.com/darkdubdeep/galaxy-slots#readme",
+    "dependencies": {
+        "browser-sync": "^2.26.7"
+    }
+}

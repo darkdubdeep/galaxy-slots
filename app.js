@@ -286,9 +286,12 @@ function onAssetsLoaded() {
             combination[2]._texture.textureCacheIds[0] ===
                 combination[3]._texture.textureCacheIds[0]
         ) {
-            console.log('BINGOOOOOOOOOO');
             money += 3;
-            console.log(money);
+            var sound = new Howl({
+                src: ['sounds/big-win.mp3']
+            });
+
+            sound.play();
         } else if (
             combination[1]._texture.textureCacheIds[0] ===
                 combination[2]._texture.textureCacheIds[0] ||
@@ -296,7 +299,17 @@ function onAssetsLoaded() {
                 combination[3]._texture.textureCacheIds[0]
         ) {
             money += 2;
+            money += 3;
+            var sound = new Howl({
+                src: ['sounds/small-win.mp3']
+            });
+
+            sound.play();
         } else {
+            var sound = new Howl({
+                src: ['sounds/stop-spinning-sound.mp3']
+            });
+            sound.play();
         }
         mainTextContainer.removeChild(balanceText);
 
@@ -403,28 +416,7 @@ function backout(amount) {
     return t => --t * t * ((amount + 1) * t + amount) + 1;
 }
 
-// const sound = PIXI.sound.Sound.from('sounds/main-theme.mp3');
-
-// PIXI.sound.Sound.from({
-//     url: 'sounds/main-theme.mp3',
-//     autoPlay: true,
-//     complete: function() {}
-// });
-
 var sound = new Howl({
     src: ['sounds/main-theme.mp3']
 });
 sound.play();
-
-function simulateClick() {
-    var evt = document.createEvent('Events');
-    evt.initEvent('click', true, true);
-    window.dispatchEvent(evt);
-}
-addEventListener(
-    'click',
-    function() {
-        console.log('test');
-    },
-    false
-);
