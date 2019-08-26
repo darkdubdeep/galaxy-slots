@@ -184,6 +184,11 @@ function onAssetsLoaded() {
         });
         sound.play();
 
+        // var sound2 = new Howl({
+        //     src: ['sounds/spinning-sound.mp3']
+        // });
+        // sound2.play();
+
         startPlay();
         playButton.scale.set(1.1, 1.1);
         playButton.x -= 5;
