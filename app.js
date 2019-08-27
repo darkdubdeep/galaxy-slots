@@ -1,6 +1,4 @@
-import { consoler } from './modules/textures.js';
-
-consoler();
+import slotTextures from './modules/sprites/reelSymbols.js';
 
 const app = new PIXI.Application({
     backgroundColor: 0x2a2f36,
@@ -29,13 +27,13 @@ let money = 100;
 // onAssetsLoaded handler builds the example.
 function onAssetsLoaded() {
     // Create different slot symbols.
-    const slotTextures = [
-        PIXI.Texture.from('img/sym1.png'),
-        PIXI.Texture.from('img/sym2.png'),
-        PIXI.Texture.from('img/sym3.png'),
-        PIXI.Texture.from('img/sym4.png'),
-        PIXI.Texture.from('img/sym5.png')
-    ];
+    // const slotTextures = [
+    //     PIXI.Texture.from('img/sym1.png'),
+    //     PIXI.Texture.from('img/sym2.png'),
+    //     PIXI.Texture.from('img/sym3.png'),
+    //     PIXI.Texture.from('img/sym4.png'),
+    //     PIXI.Texture.from('img/sym5.png')
+    // ];
 
     const bigPlanetTexture = PIXI.Texture.from('img/big-planet.png');
     const bigPlanetSprite = new PIXI.Sprite(bigPlanetTexture);
