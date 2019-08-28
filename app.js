@@ -1,4 +1,4 @@
-import { SYMBOL_SIZE } from './constants/constants.js';
+import { SYMBOL_SIZE, MAIN_COLOR } from './constants/constants.js';
 
 import slotTextures from './textures/slotTextures.js';
 import {
@@ -6,12 +6,12 @@ import {
   smallPlanetTexture
 } from './textures/plantetsTextures.js';
 
-import SymbolsWrapper from './modules/SymbolsWrapper.js';
-
+import SymbolsWrapper from './models/SymbolsWrapper.js';
 import Planet from './models/Planet.js';
+import GraphicRectShape from './models/GraphicRectShape.js';
 
 const app = new PIXI.Application({
-  backgroundColor: 0x2a2f36,
+  backgroundColor: MAIN_COLOR,
   width: window.innerWidth,
   height: window.innerHeight
 });
@@ -19,22 +19,21 @@ document.body.appendChild(app.view);
 
 app.loader
   .add([
-    'img/sym1.png',
-    'img/sym2.png',
-    'img/sym3.png',
-    'img/sym4.png',
-    'img/sym5.png',
-    'img/big-planet.png',
-    'img/small-planet.png'
+    'assets/img/sym1.png',
+    'assets/img/sym2.png',
+    'assets/img/sym3.png',
+    'assets/img/sym4.png',
+    'assets/img/sym5.png',
+    'assets/img/big-planet.png',
+    'assets/img/small-planet.png'
   ])
   .load(onAssetsLoaded);
 
+// initialize button press count indication
 let pressedCount = 0;
-let money = 100;
-// onAssetsLoaded handler builds the example.
-function onAssetsLoaded() {
-  // build rutating planets decoration
 
+function onAssetsLoaded() {
+  // build rotating planets
   const bigPlanet = new Planet(
     bigPlanetTexture,
     350,
@@ -54,18 +53,17 @@ function onAssetsLoaded() {
     1.9
   );
 
+  // Rotate planets
   app.ticker.add(() => {
     bigPlanet.sprite.rotation += 0.003;
     smallPlanet.sprite.rotation += 0.003;
   });
 
   // Build the reel and symbols
-
   const reelContainer = new PIXI.Container();
   reelContainer.y = 300;
 
   const symbolsWrapper = new SymbolsWrapper((app.screen.width - 150) / 2, -125);
-
   const symbolsContainer = symbolsWrapper.container;
 
   reelContainer.addChild(
@@ -103,59 +101,34 @@ function onAssetsLoaded() {
   }
 
   app.stage.addChild(reelContainer);
-  // Build top & bottom covers and position reelContainer
 
-  // reelContainer.x = Math.round(app.screen.width / 5);
+  // Build top & bottom decoration covers
+  const topSubContainer = new GraphicRectShape(
+    MAIN_COLOR,
+    0,
+    0,
+    140,
+    symbolsContainer.height / 4.2,
+    (app.screen.width - 140) / 2,
+    -300
+  );
 
-  const top = new PIXI.Graphics();
-  top.beginFill(0x2a2f36);
-  top.drawRect(0, 0, 140, symbolsContainer.height / 4.2);
-  top.x = (app.screen.width - 140) / 2;
-  top.y = -300;
-
-  const bottom = new PIXI.Graphics();
-  bottom.beginFill(0x2a2f36);
-  bottom.drawRect(0, 0, 140, app.screen.height / 3);
-  bottom.x = (app.screen.width - 140) / 2;
-  bottom.y = 325;
-
-  // Add play text
-  const mainTextStyle = new PIXI.TextStyle({
-    fontFamily: 'Arial',
-    fontStyle: 'italic',
-    fontSize: 36,
-    fontWeight: 'bold',
-    fill: ['#ffbffc', '#f5d5f3'], // gradient
-    wordWrapWidth: 440
-  });
-
-  const mainTextContainer = new PIXI.Graphics();
-  mainTextContainer.beginFill(0x2a2f36);
-  mainTextContainer.drawRect(0, 0, 250, 150);
-  mainTextContainer.x = (app.screen.width + 500) / 2;
-  reelContainer.addChild(mainTextContainer);
-  let balanceText;
-  const balanceTextCreator = () => {
-    balanceText = new PIXI.Text(`BALANCE: ${money} $`, mainTextStyle);
-    mainTextContainer.addChild(balanceText);
-  };
-
-  let betText = new PIXI.Text('BET: 1 $', mainTextStyle);
-  betText.y = 100;
-
-  mainTextContainer.addChild(betText);
-
-  balanceTextCreator();
-
-  reelContainer.addChild(top);
-  reelContainer.addChild(bottom);
+  const bottomSubContainer = new GraphicRectShape(
+    MAIN_COLOR,
+    0,
+    0,
+    140,
+    app.screen.height / 3,
+    (app.screen.width - 140) / 2,
+    325
+  );
 
   const playButton = new PIXI.Graphics();
   playButton.lineStyle(2, 0xff00ff, 1);
   playButton.beginFill(0x650a5a, 0.25);
   playButton.drawRoundedRect(0, 20, 100, 100, 16);
   playButton.endFill();
-  playButton.x = (bottom.width - playButton.width) / 2;
+  playButton.x = (bottomSubContainer.graphic.width - playButton.width) / 2;
   playButton.interactive = true;
   playButton.buttonMode = true;
 
@@ -172,20 +145,14 @@ function onAssetsLoaded() {
   playButtonText.x = 30;
   playButtonText.y = 60;
   playButton.addChild(playButtonText);
-  bottom.addChild(playButton);
-  // Set the interactivity.
+
+  // Set the button interactivity.
 
   playButton.addListener('pointerdown', () => {
     var sound = new Howl({
-      src: ['sounds/button-sound.mp3']
+      src: ['assets/sounds/button-sound.mp3']
     });
     sound.play();
-
-    // var sound2 = new Howl({
-    //     src: ['sounds/spinning-sound.mp3']
-    // });
-    // sound2.play();
-
     startPlay();
     playButton.scale.set(1.1, 1.1);
     playButton.x -= 5;
@@ -195,38 +162,71 @@ function onAssetsLoaded() {
     }, 100);
   });
 
-  // decoration
+  bottomSubContainer.graphic.addChild(playButton);
 
-  let running = false;
+  reelContainer.addChild(topSubContainer.graphic);
+  reelContainer.addChild(bottomSubContainer.graphic);
+
+  // main text
+  const mainTextContainer = new GraphicRectShape(
+    MAIN_COLOR,
+    0,
+    0,
+    250,
+    150,
+    (app.screen.width + 500) / 2,
+    0
+  );
+
+  const mainTextStyle = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontStyle: 'italic',
+    fontSize: 36,
+    fontWeight: 'bold',
+    fill: ['#ffbffc', '#f5d5f3'], // gradient
+    wordWrapWidth: 440
+  });
+
+  // initialize balance inidication
+  let money = 100;
+  let balanceText;
+  const balanceTextCreator = () => {
+    balanceText = new PIXI.Text(`BALANCE: ${money} $`, mainTextStyle);
+    mainTextContainer.graphic.addChild(balanceText);
+  };
+
+  let betText = new PIXI.Text('BET: 1 $', mainTextStyle);
+  betText.y = 100;
+
+  mainTextContainer.graphic.addChild(betText);
+
+  reelContainer.addChild(mainTextContainer.graphic);
+
+  balanceTextCreator();
 
   // Function to start playing.
   function startPlay() {
-    // if (running) {
-    //     return;
-    // }
-    running = true;
     pressedCount += 1;
-    console.log(money);
-    if (pressedCount > 1) {
+
+    if (pressedCount > 1 || money < 1) {
       return;
     }
     money--;
-    mainTextContainer.removeChild(balanceText);
+    mainTextContainer.graphic.removeChild(balanceText);
 
     balanceTextCreator();
     const r = reel;
     const time = 3000;
-    const extra = Math.floor(Math.random() * 3);
     const target = r.position + 10;
     tweenTo(r, 'position', target, time, backout(0.5), null, reelsComplete);
   }
 
   // Reels done handler.
   function reelsComplete() {
-    running = false;
     pressedCount = 0;
     let combination = reel.symbols;
-    console.log(combination);
+
+    // detect win combinatiop
     if (
       combination[1]._texture.textureCacheIds[0] ===
         combination[2]._texture.textureCacheIds[0] &&
@@ -235,7 +235,7 @@ function onAssetsLoaded() {
     ) {
       money += 3;
       var sound = new Howl({
-        src: ['sounds/big-win.mp3']
+        src: ['assets/sounds/big-win.mp3']
       });
 
       sound.play();
@@ -247,17 +247,17 @@ function onAssetsLoaded() {
     ) {
       money += 2;
       var sound = new Howl({
-        src: ['sounds/small-win.mp3']
+        src: ['assets/sounds/small-win.mp3']
       });
 
       sound.play();
     } else {
       var sound = new Howl({
-        src: ['sounds/stop-spinning-sound.mp3']
+        src: ['assets/sounds/stop-spinning-sound.mp3']
       });
       sound.play();
     }
-    mainTextContainer.removeChild(balanceText);
+    mainTextContainer.graphic.removeChild(balanceText);
 
     balanceTextCreator();
   }
@@ -358,7 +358,7 @@ function backout(amount) {
   return t => --t * t * ((amount + 1) * t + amount) + 1;
 }
 
-var sound = new Howl({
-  src: ['sounds/main-theme.mp3']
+var mainTheme = new Howl({
+  src: ['assets/sounds/main-theme.mp3']
 });
-sound.play();
+mainTheme.play();
