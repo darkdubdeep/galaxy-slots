@@ -195,14 +195,13 @@ function onAssetsLoaded() {
     mainTextContainer.graphic.addChild(balanceText);
   };
 
+  balanceTextCreator();
+
   let betText = new PIXI.Text('BET: 1 $', mainTextStyle);
   betText.y = 100;
 
   mainTextContainer.graphic.addChild(betText);
-
   reelContainer.addChild(mainTextContainer.graphic);
-
-  balanceTextCreator();
 
   // Function to start playing.
   function startPlay() {
@@ -352,7 +351,7 @@ function lerp(a1, a2, t) {
 function backout(amount) {
   return t => --t * t * ((amount + 1) * t + amount) + 1;
 }
-
+// bacjground sound
 var mainTheme = new Howl({
   src: ['assets/sounds/main-theme.mp3']
 });
