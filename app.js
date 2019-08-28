@@ -294,7 +294,6 @@ function onAssetsLoaded() {
 
 // Very simple tweening utility function. This should be replaced with a proper tweening library in a real product.
 const tweening = [];
-const combination = [];
 
 function tweenTo(object, property, target, time, easing, onchange, oncomplete) {
   const tween = {
@@ -319,9 +318,7 @@ app.ticker.add(delta => {
   const remove = [];
   for (let i = 0; i < tweening.length; i++) {
     const t = tweening[i];
-
     let phase;
-
     if (pressedCount > 1) {
       phase = 10;
     } else {
@@ -339,7 +336,6 @@ app.ticker.add(delta => {
       t.object[t.property] = t.target;
       if (t.complete) t.complete(t);
       remove.push(t);
-      combination.push(t);
     }
   }
   for (let i = 0; i < remove.length; i++) {
@@ -353,7 +349,6 @@ function lerp(a1, a2, t) {
 }
 
 // Backout function from tweenjs.
-// https://github.com/CreateJS/TweenJS/blob/master/src/tweenjs/Ease.js
 function backout(amount) {
   return t => --t * t * ((amount + 1) * t + amount) + 1;
 }
