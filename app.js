@@ -1,22 +1,22 @@
 //constants
 import { SYMBOL_SIZE, MAIN_COLOR } from './constants/constants.js';
-
 // textures
 import slotTextures from './textures/slotTextures.js';
 import {
   bigPlanetTexture,
   smallPlanetTexture
 } from './textures/plantetsTextures.js';
-
 //models
 import SymbolsWrapper from './models/SymbolsWrapper.js';
 import Planet from './models/Planet.js';
 import GraphicRectShape from './models/GraphicRectShape.js';
-
-//functions
+//tickers
 import { tweeningTicker } from './tickers/tweeningTicker.js';
 import { positionTicker } from './tickers/positionTicker.js';
 import { rotatePlanetsTicker } from './tickers/rotatePlanetsTicker.js';
+
+// helpers
+import { symbolsBuilder } from './helpers/symbolsBuilder.js';
 
 const app = new PIXI.Application({
   backgroundColor: MAIN_COLOR,
@@ -91,20 +91,7 @@ function onAssetsLoaded() {
   symbolsContainer.filters = [reel.blur];
 
   // Build the symbols
-  for (let i = 0; i < 5; i++) {
-    const symbol = new PIXI.Sprite(
-      slotTextures[Math.floor(Math.random() * slotTextures.length)]
-    );
-    // Scale the symbol to fit symbol area.
-    symbol.y = i * SYMBOL_SIZE;
-    symbol.scale.x = symbol.scale.y = Math.min(
-      SYMBOL_SIZE / symbol.width,
-      SYMBOL_SIZE / symbol.height
-    );
-    symbol.x = Math.round((SYMBOL_SIZE - symbol.width) / 2);
-    reel.symbols.push(symbol);
-    symbolsContainer.addChild(symbol);
-  }
+  symbolsBuilder(SYMBOL_SIZE, slotTextures, reel, symbolsContainer);
 
   app.stage.addChild(reelContainer);
 
@@ -142,6 +129,7 @@ function onAssetsLoaded() {
   // initialize balance text
   let money = 100;
   let balanceText;
+
   const balanceTextCreator = () => {
     balanceText = new PIXI.Text(`BALANCE: ${money} $`, mainTextStyle);
     mainTextContainer.graphic.addChild(balanceText);
