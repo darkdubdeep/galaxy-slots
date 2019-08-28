@@ -16,6 +16,6 @@ A basic slot game example from https://pixijs.io was used and modified
 
 Sounds were written by me
 
-<div align="center">
-    <img src="/assets/img/screen-shot.png" width="800px"</img> 
+<div align="left">
+    <img src="/assets/img/screen-shot.png" width="500px"</img> 
 </div>
