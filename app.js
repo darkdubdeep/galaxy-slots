@@ -1,14 +1,22 @@
+//constants
 import { SYMBOL_SIZE, MAIN_COLOR } from './constants/constants.js';
-
+// textures
 import slotTextures from './textures/slotTextures.js';
 import {
   bigPlanetTexture,
   smallPlanetTexture
 } from './textures/plantetsTextures.js';
-
+//models
 import SymbolsWrapper from './models/SymbolsWrapper.js';
 import Planet from './models/Planet.js';
 import GraphicRectShape from './models/GraphicRectShape.js';
+//tickers
+import { tweeningTicker } from './tickers/tweeningTicker.js';
+import { positionTicker } from './tickers/positionTicker.js';
+import { rotatePlanetsTicker } from './tickers/rotatePlanetsTicker.js';
+
+// helpers
+import { symbolsBuilder } from './helpers/symbolsBuilder.js';
 
 const app = new PIXI.Application({
   backgroundColor: MAIN_COLOR,
@@ -29,8 +37,9 @@ app.loader
   ])
   .load(onAssetsLoaded);
 
-// initialize button press count indication
-let pressedCount = 0;
+let globalParams = {
+  pressedCount: 0
+};
 
 function onAssetsLoaded() {
   // build rotating planets
@@ -54,10 +63,7 @@ function onAssetsLoaded() {
   );
 
   // Rotate planets
-  app.ticker.add(() => {
-    bigPlanet.sprite.rotation += 0.003;
-    smallPlanet.sprite.rotation += 0.003;
-  });
+  rotatePlanetsTicker(app, bigPlanet, smallPlanet);
 
   // Build the reel and symbols
   const reelContainer = new PIXI.Container();
@@ -85,24 +91,11 @@ function onAssetsLoaded() {
   symbolsContainer.filters = [reel.blur];
 
   // Build the symbols
-  for (let i = 0; i < 5; i++) {
-    const symbol = new PIXI.Sprite(
-      slotTextures[Math.floor(Math.random() * slotTextures.length)]
-    );
-    // Scale the symbol to fit symbol area.
-    symbol.y = i * SYMBOL_SIZE;
-    symbol.scale.x = symbol.scale.y = Math.min(
-      SYMBOL_SIZE / symbol.width,
-      SYMBOL_SIZE / symbol.height
-    );
-    symbol.x = Math.round((SYMBOL_SIZE - symbol.width) / 2);
-    reel.symbols.push(symbol);
-    symbolsContainer.addChild(symbol);
-  }
+  symbolsBuilder(SYMBOL_SIZE, slotTextures, reel, symbolsContainer);
 
   app.stage.addChild(reelContainer);
 
-  // Build top & bottom decoration covers
+  // Build top subcontainer
   const topSubContainer = new GraphicRectShape(
     MAIN_COLOR,
     0,
@@ -113,6 +106,46 @@ function onAssetsLoaded() {
     -300
   );
 
+  // main text subcontainer
+  const mainTextContainer = new GraphicRectShape(
+    MAIN_COLOR,
+    0,
+    0,
+    250,
+    150,
+    (app.screen.width + 500) / 2,
+    0
+  );
+
+  const mainTextStyle = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontStyle: 'italic',
+    fontSize: 36,
+    fontWeight: 'bold',
+    fill: ['#ffbffc', '#f5d5f3'], // gradient
+    wordWrapWidth: 440
+  });
+
+  // initialize balance text
+  let money = 100;
+  let balanceText;
+
+  const balanceTextCreator = () => {
+    balanceText = new PIXI.Text(`BALANCE: ${money} $`, mainTextStyle);
+    mainTextContainer.graphic.addChild(balanceText);
+  };
+
+  balanceTextCreator();
+
+  // initialize bet text text
+  let betText = new PIXI.Text('BET: 1 $', mainTextStyle);
+  betText.y = 100;
+
+  mainTextContainer.graphic.addChild(betText);
+
+  reelContainer.addChild(mainTextContainer.graphic);
+
+  // initialize bottom subcontainer
   const bottomSubContainer = new GraphicRectShape(
     MAIN_COLOR,
     0,
@@ -167,47 +200,11 @@ function onAssetsLoaded() {
   reelContainer.addChild(topSubContainer.graphic);
   reelContainer.addChild(bottomSubContainer.graphic);
 
-  // main text
-  const mainTextContainer = new GraphicRectShape(
-    MAIN_COLOR,
-    0,
-    0,
-    250,
-    150,
-    (app.screen.width + 500) / 2,
-    0
-  );
-
-  const mainTextStyle = new PIXI.TextStyle({
-    fontFamily: 'Arial',
-    fontStyle: 'italic',
-    fontSize: 36,
-    fontWeight: 'bold',
-    fill: ['#ffbffc', '#f5d5f3'], // gradient
-    wordWrapWidth: 440
-  });
-
-  // initialize balance inidication
-  let money = 100;
-  let balanceText;
-  const balanceTextCreator = () => {
-    balanceText = new PIXI.Text(`BALANCE: ${money} $`, mainTextStyle);
-    mainTextContainer.graphic.addChild(balanceText);
-  };
-
-  balanceTextCreator();
-
-  let betText = new PIXI.Text('BET: 1 $', mainTextStyle);
-  betText.y = 100;
-
-  mainTextContainer.graphic.addChild(betText);
-  reelContainer.addChild(mainTextContainer.graphic);
-
   // Function to start playing.
   function startPlay() {
-    pressedCount += 1;
+    globalParams.pressedCount += 1;
 
-    if (pressedCount > 1 || money < 1) {
+    if (globalParams.pressedCount > 1 || money < 1) {
       return;
     }
     money--;
@@ -222,7 +219,7 @@ function onAssetsLoaded() {
 
   // Reel done handler.
   function reelComplete() {
-    pressedCount = 0;
+    globalParams.pressedCount = 0;
     let combination = reel.symbols;
 
     // detect win combinatiop
@@ -261,34 +258,8 @@ function onAssetsLoaded() {
     balanceTextCreator();
   }
 
-  // Listen for animate update.
-  app.ticker.add(delta => {
-    // Update the slots.
-
-    const r = reel;
-    // Update blur filter y amount based on speed.
-    // This would be better if calculated with time in mind also. Now blur depends on frame rate.
-    r.blur.blurY = (r.position - r.previousPosition) * 10;
-    r.previousPosition = r.position;
-
-    // Update symbol positions on reel.
-    for (let j = 0; j < r.symbols.length; j++) {
-      const s = r.symbols[j];
-      const prevy = s.y;
-      s.y = ((r.position + j) % r.symbols.length) * SYMBOL_SIZE - SYMBOL_SIZE;
-      if (s.y < 0 && prevy > SYMBOL_SIZE) {
-        // Detect going over and swap a texture.
-        // This should in proper product be determined from some logical reel.
-        s.texture =
-          slotTextures[Math.floor(Math.random() * slotTextures.length)];
-        s.scale.x = s.scale.y = Math.min(
-          SYMBOL_SIZE / s.texture.width,
-          SYMBOL_SIZE / s.texture.height
-        );
-        s.x = Math.round((SYMBOL_SIZE - s.width) / 2);
-      }
-    }
-  });
+  // Listen for positioan animate update.
+  positionTicker(app, reel, slotTextures, SYMBOL_SIZE);
 }
 
 // Very simple tweening utility function. This should be replaced with a proper tweening library in a real product.
@@ -311,36 +282,8 @@ function tweenTo(object, property, target, time, easing, onchange, oncomplete) {
   return tween;
 }
 
-// Listen for animate update.
-app.ticker.add(delta => {
-  const now = Date.now();
-  const remove = [];
-  for (let i = 0; i < tweening.length; i++) {
-    const t = tweening[i];
-    let phase;
-    if (pressedCount > 1) {
-      phase = 10;
-    } else {
-      phase = Math.min(1, (now - t.start) / t.time);
-    }
-
-    t.object[t.property] = lerp(
-      t.propertyBeginValue,
-      t.target,
-      t.easing(phase)
-    );
-    if (t.change) t.change(t);
-    if (phase === 1 || pressedCount > 1) {
-      // speed
-      t.object[t.property] = t.target;
-      if (t.complete) t.complete(t);
-      remove.push(t);
-    }
-  }
-  for (let i = 0; i < remove.length; i++) {
-    tweening.splice(tweening.indexOf(remove[i]), 1);
-  }
-});
+/// Listen for animate update.
+tweeningTicker(app, tweening, globalParams, lerp);
 
 // Basic lerp funtion.
 function lerp(a1, a2, t) {
