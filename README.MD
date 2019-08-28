@@ -15,3 +15,5 @@ npm start
 A basic slot game example from https://pixijs.io was used and modified
 
 Sounds were written by me
+
+![Alt text](/assests/img/screen-shot.png?raw=true 'screen')
