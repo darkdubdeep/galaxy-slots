@@ -1,9 +1,4 @@
-export const symbolsBuilder = (
-  SYMBOL_SIZE,
-  slotTextures,
-  reel,
-  symbolsContainer
-) => {
+const symbolsBuilder = (SYMBOL_SIZE, slotTextures, reel, symbolsContainer) => {
   for (let i = 0; i < 5; i++) {
     const symbol = new PIXI.Sprite(
       slotTextures[Math.floor(Math.random() * slotTextures.length)]
@@ -19,3 +14,4 @@ export const symbolsBuilder = (
     symbolsContainer.addChild(symbol);
   }
 };
+export default symbolsBuilder;

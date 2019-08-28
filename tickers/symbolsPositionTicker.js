@@ -1,4 +1,4 @@
-export const positionTicker = (app, reel, slotTextures, SYMBOL_SIZE) => {
+const symbolsPositionTicker = (app, reel, slotTextures, SYMBOL_SIZE) => {
   app.ticker.add(delta => {
     // Update the slots.
 
@@ -27,3 +27,5 @@ export const positionTicker = (app, reel, slotTextures, SYMBOL_SIZE) => {
     }
   });
 };
+
+export default symbolsPositionTicker;

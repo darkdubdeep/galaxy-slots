@@ -1,4 +1,4 @@
-export const tweeningTicker = (app, tweening, globalParams, lerp) => {
+const tweeningTicker = (app, tweening, globalParams, lerp) => {
   app.ticker.add(delta => {
     const now = Date.now();
     const remove = [];
@@ -29,3 +29,4 @@ export const tweeningTicker = (app, tweening, globalParams, lerp) => {
     }
   });
 };
+export default tweeningTicker;

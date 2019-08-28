@@ -11,12 +11,12 @@ import SymbolsWrapper from './models/SymbolsWrapper.js';
 import Planet from './models/Planet.js';
 import GraphicRectShape from './models/GraphicRectShape.js';
 //tickers
-import { tweeningTicker } from './tickers/tweeningTicker.js';
-import { positionTicker } from './tickers/positionTicker.js';
-import { rotatePlanetsTicker } from './tickers/rotatePlanetsTicker.js';
+import tweeningTicker from './tickers/tweeningTicker.js';
+import symbolsPositionTicker from './tickers/symbolsPositionTicker.js';
+import rotatePlanetsTicker from './tickers/rotatePlanetsTicker.js';
 
 // helpers
-import { symbolsBuilder } from './helpers/symbolsBuilder.js';
+import symbolsBuilder from './helpers/symbolsBuilder.js';
 
 const app = new PIXI.Application({
   backgroundColor: MAIN_COLOR,
@@ -259,7 +259,7 @@ function onAssetsLoaded() {
   }
 
   // Listen for positioan animate update.
-  positionTicker(app, reel, slotTextures, SYMBOL_SIZE);
+  symbolsPositionTicker(app, reel, slotTextures, SYMBOL_SIZE);
 }
 
 // Very simple tweening utility function. This should be replaced with a proper tweening library in a real product.
