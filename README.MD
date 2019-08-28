@@ -16,4 +16,4 @@ A basic slot game example from https://pixijs.io was used and modified
 
 Sounds were written by me
 
-![Alt text](/assests/img/screen-shot.png 'screen')
+![ScreenShot](https://raw.github.com/{darkdubdeep}/{galaxy-slots}/{master}/{/assets/img/screen-shot.png})
