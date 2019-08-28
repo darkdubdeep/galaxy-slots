@@ -218,11 +218,11 @@ function onAssetsLoaded() {
     const r = reel;
     const time = 3000;
     const target = r.position + 10;
-    tweenTo(r, 'position', target, time, backout(0.5), null, reelsComplete);
+    tweenTo(r, 'position', target, time, backout(0.5), null, reelComplete);
   }
 
-  // Reels done handler.
-  function reelsComplete() {
+  // Reel done handler.
+  function reelComplete() {
     pressedCount = 0;
     let combination = reel.symbols;
 
